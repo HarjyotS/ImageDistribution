@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Image Upload</title>
+  </head>
+  <body>
+    <h1>Upload an Image</h1>
+    <form id="upload-form" enctype="multipart/form-data">
+      <input
+        type="file"
+        name="image"
+        id="image-input"
+        accept="image/png, image/jpeg"
+      />
+      <button type="submit">Upload</button>
+    </form>
+
+    <h2>Response Code:</h2>
+    <p id="response-code"></p>
+
+    <h2>Display Image</h2>
+    <div id="image-container"></div>
+
+    <h2>Enter Code to Display Image</h2>
+    <input type="text" id="code-input" placeholder="Enter code" />
+    <button type="button" id="display-button">Display</button>
+
+    <script>
+      const form = document.getElementById("upload-form");
+      const imageInput = document.getElementById("image-input");
+      const responseCode = document.getElementById("response-code");
+      const imageContainer = document.getElementById("image-container");
+      const codeInput = document.getElementById("code-input");
+      const displayButton = document.getElementById("display-button");
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault(); // Prevent the default form submission behavior
+
+        const file = imageInput.files[0];
+        const formData = new FormData();
+        formData.append("image", file);
+
+        fetch("http://localhost:5000/upload", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.text())
+          .then((code) => {
+            responseCode.textContent = code;
+            displayImage(code);
+          })
+          .catch((error) => console.error("Error:", error));
+      });
+
+      displayButton.addEventListener("click", () => {
+        const code = codeInput.value;
+        displayImage(code);
+      });
+
+      function displayImage(code) {
+        const imageElement = document.createElement("img");
+        imageElement.src = `http://localhost:5000/download/${code}`;
+        imageContainer.innerHTML = "";
+        imageContainer.appendChild(imageElement);
+      }
+    </script>
+  </body>
+</html>
